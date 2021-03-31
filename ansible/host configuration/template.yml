@@ -12,6 +12,11 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
+          default: SecurityParameters
+        Parameters:
+          - SecurityGroupID
+          - KeyPairName
+      - Label:
           default: ManagementNode
         Parameters:
           - ManagementNodeInstanceType
@@ -42,6 +47,10 @@ Parameters:
   SecurityGroupID:
     Type: AWS::EC2::SecurityGroup::Id
     Description: Security group for the EC2 instances
+  
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
 
   ManagementNodeInstanceType:
     Type: String
@@ -89,7 +98,7 @@ Resources:
           - !Ref 'AWS::Region'
           - linux
       InstanceType: !Ref ManagementNodeInstanceType
-      KeyName: YOUR_KEY_PAIR_NAME
+      KeyName: KeyPairName
       SecurityGroupIds:
         - !Ref SecurityGroupID
       UserData:
@@ -117,7 +126,7 @@ Resources:
           - !Ref AWS::Region
           - !Ref HostInstance1AMI
       InstanceType: !Ref HostInstance1Type
-      KeyName: YOUR_KEY_PAIR_NAME
+      KeyName: KeyPairName
       SecurityGroupIds: 
       - !Ref SecurityGroupID
 
@@ -133,7 +142,7 @@ Resources:
           - !Ref AWS::Region
           - !Ref HostInstance2AMI
       InstanceType: !Ref HostInstance2Type
-      KeyName: YOUR_KEY_PAIR_NAME
+      KeyName: KeyPairName
       SecurityGroupIds: 
       - !Ref SecurityGroupID
 

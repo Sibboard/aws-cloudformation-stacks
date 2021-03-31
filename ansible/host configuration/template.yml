@@ -1,0 +1,133 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  This stack creates:
+  - 1x EC2 instance with ansible installation [ansible management node]
+  - 2x EC2 instances functioning as hosts node [ansible hosts TODO: TO BE CONFIGURED]
+
+  PREREQUISITES:
+  - create security group for ssh [optional: could be created on this template]
+  - create access key to ssh into the instances [mandatory]
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: ManagementNode
+        Parameters:
+          - 
+    
+    ParameterLabels:
+      ActivateAWSManagedRulesParam:
+        default: Activate AWS Managed Rules Protection
+
+Parameters:
+  SecurityGroupID:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security group for the EC2 instances
+
+  ManagementNodeInstanceType:
+    Type: String
+    Description: EC2 Instance type for Ansible Management Node
+    Default: t2.micro
+
+  HostInstance1Type:
+    Type: String
+    Description: EC2 Instance type for Ansible Host 1
+    Default: t2.micro
+  
+  HostInstance1AMI:
+    Type: String
+    Description: Choose linux or win
+    AllowedValues: [linux, win]
+  
+  HostInstance2Type:
+    Type: String
+    Description: EC2 Instance type for Ansible Host 2
+    Default: 't2.micro'
+
+  HostInstance2AMI:
+    Type: String
+    Description: Choose linux or win
+    AllowedValues: [linux, win]
+
+
+Mappings:
+  AWSRegionToAMI:
+    eu-central-1:
+      linux: 'ami-013fffc873b1eaa1c'
+      win: 'ami-0fbc0724a0721c688'
+
+Resources:
+
+  ManagementNode:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      Tags:
+        - Key: 'Name'
+          Value: 'ManagementNode' 
+      ImageId: 
+        !FindInMap 
+          - AWSRegionToAMI
+          - !Ref 'AWS::Region'
+          - linux
+      InstanceType: !Ref ManagementNodeInstanceType
+      KeyName: net4market-keypair
+      SecurityGroupIds:
+        - !Ref SecurityGroupID
+      UserData:
+        Fn::Base64: |
+              #!/bin/bash -ex
+              amazon-linux-extras install epel
+              yum update -y
+              yum install ansible -y
+              yum install nginx -y
+              yum install git -y
+              yum install python3 python3-devel python3-pip -y
+              pip3 install boto boto3 botocore
+              systemctl start nginx
+              systemctl enable nginx
+
+  HostInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      Tags:
+        - Key: 'Name'
+          Value: 'HostNode-1' 
+      ImageId: 
+        !FindInMap 
+          - AWSRegionToAMI
+          - !Ref AWS::Region
+          - !Ref HostInstance1AMI
+      InstanceType: !Ref HostInstance1Type
+      KeyName: net4market-keypair
+      SecurityGroupIds: 
+      - !Ref SecurityGroupID
+
+  HostInstance2:
+    Type: AWS::EC2::Instance
+    Properties:
+      Tags:
+        - Key: 'Name'
+          Value: 'HostNode2' 
+      ImageId:
+        !FindInMap 
+          - AWSRegionToAMI
+          - !Ref AWS::Region
+          - !Ref HostInstance2AMI
+      InstanceType: !Ref HostInstance2Type
+      KeyName: net4market-keypair
+      SecurityGroupIds: 
+      - !Ref SecurityGroupID
+
+Outputs:
+  ManagementNodeId:
+    Description: The Management Node Instance ID
+    Value: !Ref ManagementNode
+  
+  HostInstance1ID:
+    Description: Host1 Instance ID 
+    Value: !Ref HostInstance1
+
+  HostInstance2ID:
+    Description: Host2 Instance ID 
+    Value: !Ref HostInstance2

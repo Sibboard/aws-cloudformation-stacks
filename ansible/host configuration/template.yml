@@ -14,11 +14,29 @@ Metadata:
       - Label:
           default: ManagementNode
         Parameters:
-          - 
-    
+          - ManagementNodeInstanceType
+      - Label:
+          default: HostNode1
+        Parameters:
+          - HostInstance1Type
+          - HostInstance1AMI
+      - Label:
+          default: HostNode2
+        Parameters:
+          - HostInstance2Type
+          - HostInstance2AMI
+
     ParameterLabels:
-      ActivateAWSManagedRulesParam:
-        default: Activate AWS Managed Rules Protection
+      ManagementNodeInstanceType:
+        default: Instance type of the Ansible Management Node
+      HostInstance1Type:
+        default: Instance type of the  Host \#1
+      HostInstance1AMI:
+        default: AMI image of the  Host \#1
+      HostInstance2Type:
+        default: Instance type of the  Host \#2
+      HostInstance2AMI:
+        default: AMI image of the  Host \#2
 
 Parameters:
   SecurityGroupID:
@@ -28,12 +46,12 @@ Parameters:
   ManagementNodeInstanceType:
     Type: String
     Description: EC2 Instance type for Ansible Management Node
-    Default: t2.micro
+    AllowedValues: [t2.micro]
 
   HostInstance1Type:
     Type: String
     Description: EC2 Instance type for Ansible Host 1
-    Default: t2.micro
+    AllowedValues: [t2.micro]
   
   HostInstance1AMI:
     Type: String
@@ -43,7 +61,7 @@ Parameters:
   HostInstance2Type:
     Type: String
     Description: EC2 Instance type for Ansible Host 2
-    Default: 't2.micro'
+    AllowedValues: [t2.micro]
 
   HostInstance2AMI:
     Type: String
@@ -71,7 +89,7 @@ Resources:
           - !Ref 'AWS::Region'
           - linux
       InstanceType: !Ref ManagementNodeInstanceType
-      KeyName: net4market-keypair
+      KeyName: YOUR_KEY_PAIR_NAME
       SecurityGroupIds:
         - !Ref SecurityGroupID
       UserData:
@@ -99,7 +117,7 @@ Resources:
           - !Ref AWS::Region
           - !Ref HostInstance1AMI
       InstanceType: !Ref HostInstance1Type
-      KeyName: net4market-keypair
+      KeyName: YOUR_KEY_PAIR_NAME
       SecurityGroupIds: 
       - !Ref SecurityGroupID
 
@@ -115,7 +133,7 @@ Resources:
           - !Ref AWS::Region
           - !Ref HostInstance2AMI
       InstanceType: !Ref HostInstance2Type
-      KeyName: net4market-keypair
+      KeyName: YOUR_KEY_PAIR_NAME
       SecurityGroupIds: 
       - !Ref SecurityGroupID
 

@@ -12,3 +12,4 @@ TODO:
 - arrange in a better way the outputs
 - design a nested stack for a proper EC2 instantiation, the most customizable as possible (choosing among all ami/instance size/region)
 - add ansible sample inventory file, playbook,...
+    https://www.bogotobogo.com/DevOps/Ansible/Ansible-aws-creating-ec2-instance.php
